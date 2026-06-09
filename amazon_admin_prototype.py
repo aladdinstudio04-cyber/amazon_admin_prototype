@@ -1,4 +1,3 @@
-```python
 import asyncio
 import logging
 import os
@@ -15,11 +14,16 @@ from aiogram.enums import ParseMode
 # Securely fetch token from Render Environment Variables
 BOT_TOKEN = os.getenv("BOT_TOKEN") 
 
-# Securely fetch channel ID
+# Securely fetch channel ID, defaults to test channel if not set
 CHANNEL_ID = os.getenv("CHANNEL_ID", "@alans_deals_test")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - [%(levelname)s] - %(message)s")
 logger = logging.getLogger(__name__)
+
+# Guard against missing token during deployment
+if not BOT_TOKEN:
+    logger.error("CRITICAL: BOT_TOKEN environment variable is missing!")
+    exit(1)
 
 bot = Bot(token=BOT_TOKEN, parse_mode=ParseMode.HTML)
 dp = Dispatcher()
@@ -94,7 +98,7 @@ async def process_approval(callback: CallbackQuery):
         reply_markup=None
     )
     
-    # 2. ACTUALLY PUSH TO THE PUBLIC CHANNEL
+    # 2. Push to the public channel
     try:
         await bot.send_photo(
             chat_id=CHANNEL_ID,
@@ -116,7 +120,7 @@ async def process_rejection(callback: CallbackQuery):
     await callback.answer("Offerta cancellata.")
 
 # ==========================================
-# EXECUTION
+# DUMMY WEB SERVER FOR RENDER
 # ==========================================
 async def handle_ping(request):
     """Dummy web server response to keep Render health checks happy."""
@@ -125,22 +129,22 @@ async def handle_ping(request):
 async def main():
     logger.info("Starting Premium Bot Architecture...")
     
-    # Start a dummy web server so Render doesn't crash the deploy
+    # Start the dummy web server so Render doesn't crash the deploy
     app = web.Application()
     app.router.add_get('/', handle_ping)
     runner = web.AppRunner(app)
     await runner.setup()
+    
+    # Bind to the port Render expects
     port = int(os.environ.get("PORT", 8080))
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
     logger.info(f"Dummy web server listening on port {port}")
 
+    # Start the Telegram bot
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-
-```
+    
