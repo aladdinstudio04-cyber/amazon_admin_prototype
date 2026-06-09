@@ -7,6 +7,7 @@ from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.enums import ParseMode
+from aiogram.client.default import DefaultBotProperties
 
 # ==========================================
 # CONFIGURATION 
@@ -25,7 +26,8 @@ if not BOT_TOKEN:
     logger.error("CRITICAL: BOT_TOKEN environment variable is missing!")
     exit(1)
 
-bot = Bot(token=BOT_TOKEN, parse_mode=ParseMode.HTML)
+# Updated initialization for aiogram 3.7.0+
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
 # ==========================================
