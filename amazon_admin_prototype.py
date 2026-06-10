@@ -11,7 +11,7 @@ SETUP GUIDE
 2.  Create a .env file (or set real environment variables on Render/Railway):
 
     BOT_TOKEN=your_telegram_bot_token
-    ADMIN_IDS=1391672200,987654321          # comma-separated Telegram user IDs
+    ADMIN_IDS=123456789,987654321          # comma-separated Telegram user IDs
     CHANNEL_IDS=@channel1,@channel2        # comma-separated channel usernames / IDs
     AMAZON_ACCESS_KEY=your_pa_api_key
     AMAZON_SECRET_KEY=your_pa_api_secret
